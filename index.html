@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🚀 Wenchang Aerospace City · Watch & Play — FTP Unit 3 Warm-up</title>
+<style>
+  * { box-sizing: border-box; user-select: none; margin: 0; padding: 0;
+      font-family: 'Segoe UI', 'Comic Sans MS', 'Chalkboard SE', sans-serif; }
+  body {
+    min-height: 100vh;
+    background: linear-gradient(145deg, #0b1a3a 0%, #1b3b6f 100%);
+    display: flex; justify-content: center; align-items: center; padding: 12px;
+  }
+  .game-wrapper {
+    background: #fef9e7; border-radius: 40px;
+    border: 6px solid #ffb347;
+    box-shadow: 0 20px 30px rgba(0,0,0,.6), inset 0 -5px 0 #d4b48c;
+    padding: 14px 18px 18px; max-width: 1000px; width: 100%;
+    height: 96vh; max-height: 780px;
+    display: flex; flex-direction: column;
+    background-image: radial-gradient(circle at 20% 20%, #fff9e6 0%, #fef3d6 100%);
+  }
+  /* ---------- top bar ---------- */
+  .topbar { display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+            margin-bottom: 10px; flex-shrink: 0; }
+  .logo { font-weight: 900; font-size: 1.15rem; color: #0e4c74; }
+  .logo small { display: block; font-size: .68rem; letter-spacing: 2px; color: #1e88c7; font-weight: 700; }
+  .tabs { display: flex; gap: 8px; margin-left: auto; }
+  .tab { border: 3px solid #7aa5d9; background: #e8f0fe; color: #2a3b4c;
+         border-radius: 40px; padding: 7px 16px; font-weight: 800; font-size: .95rem;
+         cursor: pointer; box-shadow: 0 4px 0 #3f5e8c; transition: all .07s; }
+  .tab:active { transform: translateY(3px); box-shadow: 0 1px 0 #3f5e8c; }
+  .tab.active { background: #0e4c74; color: #fff; border-color: #0e4c74;
+                box-shadow: 0 4px 0 #062a42; }
+  .panel { flex: 1; min-height: 0; overflow: auto; border-radius: 24px; }
+  .hidden { display: none !important; }
+
+  /* ---------- watch ---------- */
+  .watch-grid { display: flex; flex-direction: column; gap: 12px; height: 100%; }
+  .video-card { background: #0b1a3a; border-radius: 24px; border: 4px solid #7aa5d9;
+                padding: 10px; flex-shrink: 0; }
+  .video-card video { width: 100%; max-height: 42vh; display: block;
+                      border-radius: 16px; background: #000; }
+  .video-tip { color: #cfe3f7; font-size: .85rem; text-align: center; padding-top: 6px; }
+  .task-card { background: #fff; border: 4px dashed #ffb347; border-radius: 24px;
+               padding: 14px 18px; }
+  .task-title { font-weight: 900; color: #e63946; font-size: 1.05rem; margin-bottom: 4px; }
+  .task-card p { color: #3e5566; font-size: .92rem; margin-bottom: 10px; }
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; }
+  .chip { border: 2px solid #7aa5d9; background: #eef6fd; color: #0e4c74;
+          border-radius: 30px; padding: 7px 14px; font-weight: 800; font-size: .92rem;
+          cursor: pointer; transition: all .12s; }
+  .chip.heard { background: #6aa84f; border-color: #3f6b2b; color: #fff; }
+  .chip.heard::after { content: " ✓"; }
+  .chip-count { margin-top: 10px; font-weight: 900; color: #0e4c74; font-size: 1rem; }
+  .go-btn { margin-top: 12px; background: #f05454; color: #fff; border: 3px solid #ffb3b3;
+            border-radius: 40px; padding: 10px 26px; font-size: 1.05rem; font-weight: 900;
+            cursor: pointer; box-shadow: 0 6px 0 #9e2b2b; }
+  .go-btn:active { transform: translateY(4px); box-shadow: 0 2px 0 #9e2b2b; }
+
+  /* ---------- play ---------- */
+  .play-wrap { display: flex; flex-direction: column; gap: 10px; height: 100%; }
+  .hud { display: flex; gap: 10px; align-items: center; flex-shrink: 0; }
+  .pill { background: #ffd966; border: 3px solid #b38b40; border-radius: 40px;
+          padding: 4px 16px; font-weight: 900; color: #2d2d2d; font-size: 1.15rem;
+          box-shadow: inset 0 -4px 0 #c99f3c; }
+  .pill.green { background: #b5e6b5; border-color: #5f9e5f; box-shadow: inset 0 -4px 0 #7fb37f; }
+  .restart-btn { margin-left: auto; background: #f05454; border: 3px solid #ffb3b3;
+                 border-radius: 40px; padding: 6px 18px; font-weight: 800; color: #fff;
+                 cursor: pointer; box-shadow: 0 5px 0 #9e2b2b; }
+  .restart-btn:active { transform: translateY(3px); box-shadow: 0 2px 0 #9e2b2b; }
+  .falling-zone { flex: 1; position: relative; background: #d9e9fa; min-height: 220px;
+                  border-radius: 30px 30px 18px 18px; border: 4px dashed #7aa5d9;
+                  overflow: hidden; box-shadow: inset 0 8px 20px rgba(0,20,50,.1); }
+  .prompt-zone { background: #fff3cd; border: 4px solid #ffb347; border-radius: 22px;
+                 box-shadow: 0 6px 0 #b36b1e; padding: 10px 18px; flex-shrink: 0;
+                 display: flex; flex-direction: column; align-items: center;
+                 justify-content: center; min-height: 92px; }
+  .prompt-label { font-size: .72rem; color: #a1601a; font-weight: 800;
+                  letter-spacing: 1px; text-transform: uppercase; margin-bottom: 2px; }
+  .prompt-text { font-size: 1.08rem; font-weight: 700; color: #2a3b4c;
+                 line-height: 1.4; text-align: center; }
+  .prompt-text .blank { color: #e63946; font-weight: 900; letter-spacing: 2px;
+                        border-bottom: 3px solid #e63946; padding: 0 14px; }
+  .prompt-text .num { color: #1e88c7; font-weight: 900; margin-right: 6px; }
+  .prompt-bottom { display: flex; align-items: center; gap: 12px; margin-top: 4px; }
+  .speaker-btn { background: #ffb347; border: 3px solid #b36b1e; border-radius: 50%;
+                 width: 40px; height: 40px; font-size: 1.2rem; cursor: pointer;
+                 color: #2d2d2d; box-shadow: 0 3px 0 #8f5e2e; flex-shrink: 0; }
+  .speaker-btn.playing { background: #6aa84f; border-color: #3f6b2b; color: #fff; }
+  .miss-tip { font-size: .85rem; color: #ab2f2f; font-weight: 800; min-height: 1.1em; }
+  .red-envelope { position: absolute; width: 150px; height: 74px; background: #e63946;
+                  border: 3px solid #ffb347; border-radius: 14px;
+                  box-shadow: 0 6px 0 #9e2b2b, 0 8px 14px rgba(0,0,0,.3);
+                  display: flex; justify-content: center; align-items: center;
+                  text-align: center; font-weight: 800; font-size: 1rem; color: #fff7e0;
+                  padding: 4px 8px; cursor: pointer; line-height: 1.15; z-index: 20;
+                  background-image: radial-gradient(circle at 30% 30%, #ff7b7b 0%, #e63946 80%);
+                  transition: transform .08s, box-shadow .08s; will-change: top; }
+  .red-envelope.long { font-size: .8rem; }
+  .red-envelope::after { content: "🚀"; position: absolute; top: -10px; right: -8px;
+                         font-size: 1.2rem; transform: rotate(15deg); }
+  .red-envelope:hover { transform: scale(1.03); }
+  .red-envelope.correct { background: #6aa84f; border-color: #b6e3a0;
+                          box-shadow: 0 0 0 6px #ffe28c, 0 6px 0 #3f6b2b;
+                          animation: pop .3s ease; pointer-events: none; }
+  @keyframes pop { 0%{transform:scale(1)} 50%{transform:scale(1.15)} 100%{transform:scale(1)} }
+  .red-envelope.wrong { background: #777; border-color: #bbb; color: #ddd;
+                        box-shadow: 0 0 0 5px #ffb3b3; animation: shake .3s ease;
+                        pointer-events: none; opacity: .9; }
+  @keyframes shake { 0%{transform:translateX(0)} 25%{transform:translateX(-8px)}
+                     50%{transform:translateX(8px)} 75%{transform:translateX(-4px)}
+                     100%{transform:translateX(0)} }
+
+  /* ---------- review ---------- */
+  .review-card { background: #fff; border: 4px solid #7aa5d9; border-radius: 24px;
+                 padding: 18px 22px; }
+  .review-card h3 { color: #0e4c74; font-size: 1.15rem; margin-bottom: 10px;
+                    font-weight: 900; }
+  .passage { font-family: Georgia, 'Times New Roman', serif; font-size: 1.02rem;
+             color: #3e5566; line-height: 1.75; }
+  .passage b { color: #0e4c74; }
+  .passage .no { color: #1e88c7; font-weight: 700; font-size: .85rem; }
+  .vocab-grid { margin-top: 14px; display: grid; gap: 6px; }
+  .vrow { display: grid; grid-template-columns: 34px 1.2fr 2fr 1fr; gap: 8px;
+          align-items: baseline; padding: 6px 10px; border-radius: 12px;
+          background: #f2f8fc; font-size: .95rem; }
+  .vrow:nth-child(even) { background: #fff; }
+  .vrow .n { color: #f0a202; font-weight: 900; }
+  .vrow .w { color: #0e4c74; font-weight: 800; }
+  .vrow .p { color: #8a97a3; font-style: italic; font-size: .82rem; }
+  .vrow .c { color: #3e5566; }
+
+  /* ---------- overlay ---------- */
+  .message-overlay { position: fixed; inset: 0; background: rgba(10,20,40,.75);
+                     display: flex; justify-content: center; align-items: center;
+                     z-index: 200; visibility: hidden; opacity: 0; transition: opacity .2s; }
+  .message-overlay.show { visibility: visible; opacity: 1; }
+  .message-card { background: #ffefc0; border-radius: 50px; padding: 34px 54px;
+                  text-align: center; border: 8px solid #ffb347;
+                  box-shadow: 0 16px 0 #8f5e2e; }
+  .message-card h2 { font-size: 2.2rem; color: #f05454; margin-bottom: 8px; font-weight: 900; }
+  .message-card p { font-size: 1.25rem; color: #2a3b4c; font-weight: 700; margin-bottom: 16px; }
+  .message-card button { background: #6aa84f; border: none; padding: 12px 40px;
+                         font-size: 1.3rem; font-weight: 900; border-radius: 40px;
+                         color: #fff; cursor: pointer; box-shadow: 0 8px 0 #3f6b2b; }
+
+  @media (max-width: 700px) {
+    .game-wrapper { padding: 10px; height: 98vh; border-radius: 26px; }
+    .logo { font-size: .95rem; }
+    .tab { padding: 6px 10px; font-size: .8rem; }
+    .red-envelope { width: 108px; height: 62px; font-size: .8rem; }
+    .red-envelope.long { font-size: .68rem; }
+    .prompt-text { font-size: .95rem; }
+    .vrow { grid-template-columns: 26px 1.1fr 1.8fr 1fr; font-size: .85rem; }
+  }
+</style>
+</head>
+<body>
+<div class="game-wrapper">
+  <div class="topbar">
+    <div class="logo">🚀 Wenchang International Aerospace City
+      <small>FTP UNIT 3 · WARM-UP · WATCH &amp; PLAY</small></div>
+    <div class="tabs">
+      <button class="tab active" data-tab="watch">📺 1 · Watch</button>
+      <button class="tab" data-tab="play">🎮 2 · Play</button>
+      <button class="tab" data-tab="review">📖 3 · Review</button>
+    </div>
+  </div>
+
+  <!-- ============ WATCH ============ -->
+  <div class="panel" id="panel-watch">
+    <div class="watch-grid">
+      <div class="video-card">
+        <video id="lessonVideo" controls playsinline preload="metadata" src="warm-up.mp4"></video>
+        <div class="video-tip" id="videoTip">▶ Watch the warm-up video about Wenchang International Aerospace City.</div>
+      </div>
+      <div class="task-card">
+        <div class="task-title">🎧 Listen while you watch</div>
+        <p>These are the 10 key words of this unit. Tap a word when you hear it in the video.</p>
+        <div class="chips" id="chips"></div>
+        <div class="chip-count">Words spotted: <span id="chipCount">0</span> / 10</div>
+        <button class="go-btn" id="goPlay">I'm ready — Play the game 🚀</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ PLAY ============ -->
+  <div class="panel hidden" id="panel-play">
+    <div class="play-wrap">
+      <div class="hud">
+        <div class="pill">⏱ <span id="timerDisplay">120</span>s</div>
+        <div class="pill green">🏆 <span id="scoreDisplay">0</span> / 10</div>
+        <button class="restart-btn" id="restartButton">🔄 Restart</button>
+      </div>
+      <div class="falling-zone" id="fallingZone"></div>
+      <div class="prompt-zone">
+        <div class="prompt-label">Tap the envelope that completes the sentence</div>
+        <div class="prompt-text" id="promptText">Loading…</div>
+        <div class="prompt-bottom">
+          <button class="speaker-btn" id="speakerBtn" title="Hear the word">🔊</button>
+          <div class="miss-tip" id="missTip"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ REVIEW ============ -->
+  <div class="panel hidden" id="panel-review">
+    <div class="review-card">
+      <h3>📖 The whole story — check your answers</h3>
+      <p class="passage">
+        Wenchang International Aerospace City is a major <span class="no">(1)</span> <b>hub</b>
+        for China's <span class="no">(2)</span> <b>commercial</b> space industry. It hosts the
+        country's first commercial space <span class="no">(3)</span> <b>launch site</b>, where
+        rockets carrying satellites move straight from <span class="no">(4)</span> <b>assembly</b>
+        to launch, ready to lift off as soon as they leave the factory. The city also uses the
+        Free Trade Port's data policy and its modern <span class="no">(5)</span>
+        <b>infrastructure</b> to attract rocket, satellite and satellite-data companies.
+        Cooperation is another focus: using a <span class="no">(6)</span> <b>remote sensing</b>
+        AI model, the city provides satellite data services to <span class="no">(7)</span>
+        <b>Belt and Road</b> countries and <span class="no">(8)</span> <b>BRICS</b> countries,
+        and it will soon offer satellite <span class="no">(9)</span> <b>manufacturing</b> and
+        launch services to support their <span class="no">(10)</span>
+        <b>sustainable development</b>.
+      </p>
+      <h3 style="margin-top:18px;">🔤 Key words</h3>
+      <div class="vocab-grid" id="vocabGrid"></div>
+    </div>
+  </div>
+</div>
+
+<div class="message-overlay" id="messageOverlay">
+  <div class="message-card">
+    <h2 id="messageTitle">🚀 Great!</h2>
+    <p id="messageText">Well done!</p>
+    <button id="restartFromOverlay">Play Again</button>
+  </div>
+</div>
+
+<script>
+(function () {
+  /* ================= data ================= */
+  const WORDS = [
+    { word: 'hub',                     phon: 'hʌb',                   cn: '枢纽；中心' },
+    { word: 'commercial',              phon: 'kəˈmɜːʃl',               cn: '商业的；商贸的' },
+    { word: 'launch site',             phon: 'lɔːntʃ saɪt',            cn: '发射场；发射基地' },
+    { word: 'assembly',                phon: 'əˈsembli',               cn: '装配；总装' },
+    { word: 'infrastructure',          phon: 'ˈɪnfrəstrʌktʃə(r)',      cn: '基础设施' },
+    { word: 'remote sensing',          phon: 'rɪˌməʊt ˈsensɪŋ',        cn: '遥感' },
+    { word: 'Belt and Road',           phon: 'ˌbelt ən ˈrəʊd',         cn: '一带一路' },
+    { word: 'BRICS',                   phon: 'brɪks',                  cn: '金砖国家' },
+    { word: 'manufacturing',           phon: 'ˌmænjuˈfæktʃərɪŋ',       cn: '制造业；制造' },
+    { word: 'sustainable development', phon: 'səˌsteɪnəbl dɪˈveləpmənt', cn: '可持续发展' },
+  ];
+
+  const ITEMS = [
+    { n: 1, word: 'hub',
+      text: "Wenchang International Aerospace City is a major ______ for China's space industry." },
+    { n: 2, word: 'commercial',
+      text: "It is the home of China's ______ space industry — space business, not only state projects." },
+    { n: 3, word: 'launch site',
+      text: "The city hosts the country's first commercial space ______, where rockets lift off." },
+    { n: 4, word: 'assembly',
+      text: "Rockets carrying satellites move straight from ______ to launch, ready as soon as they leave the factory." },
+    { n: 5, word: 'infrastructure',
+      text: "The city uses the Free Trade Port's data policy and its modern ______ to attract space companies." },
+    { n: 6, word: 'remote sensing',
+      text: "Using a ______ AI model, the city provides satellite data services to its partners." },
+    { n: 7, word: 'Belt and Road',
+      text: "It provides satellite data services to ______ countries along the Silk Road routes." },
+    { n: 8, word: 'BRICS',
+      text: "It also serves ______ countries — major emerging economies such as Brazil, Russia and India." },
+    { n: 9, word: 'manufacturing',
+      text: "Soon the city will offer satellite ______ and launch services to its partners." },
+    { n: 10, word: 'sustainable development',
+      text: "All of this cooperation supports their ______ — growth for today and tomorrow." },
+  ];
+
+  const TOTAL_TIME = 120;
+  const FALLING_SPEED_BASE = 0.55;
+
+  /* ================= state ================= */
+  let roundIndex = 0, score = 0, timer = TOTAL_TIME;
+  let timerInterval = null, spawnIntervalId = null, animationFrameId = null;
+  let gameActive = false, envelopes = [], speechSynth = window.speechSynthesis || null;
+
+  const $ = id => document.getElementById(id);
+  const fallingZone = $('fallingZone'), promptText = $('promptText'),
+        timerDisplay = $('timerDisplay'), scoreDisplay = $('scoreDisplay'),
+        missTip = $('missTip'), speakerBtn = $('speakerBtn'),
+        messageOverlay = $('messageOverlay'), messageTitle = $('messageTitle'),
+        messageText = $('messageText');
+
+  function shuffle(arr) {
+    for (let i = arr.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+    return arr;
+  }
+  function speak(word) {
+    if (!speechSynth) return;
+    speechSynth.cancel();
+    const u = new SpeechSynthesisUtterance(word);
+    u.lang = 'en-US'; u.rate = 0.9;
+    u.onstart = () => speakerBtn.classList.add('playing');
+    u.onend = u.onerror = () => speakerBtn.classList.remove('playing');
+    speechSynth.speak(u);
+  }
+
+  /* ================= tabs ================= */
+  const video = $('lessonVideo');
+  document.querySelectorAll('.tab').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.tab').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      ['watch', 'play', 'review'].forEach(t =>
+        $('panel-' + t).classList.toggle('hidden', t !== btn.dataset.tab));
+      if (btn.dataset.tab !== 'watch') { try { video.pause(); } catch (e) {} }
+      if (btn.dataset.tab === 'play' && !gameActive) resetGame();
+    });
+  });
+  $('goPlay').addEventListener('click', () =>
+    document.querySelector('.tab[data-tab="play"]').click());
+  video.addEventListener('error', () => {
+    $('videoTip').textContent = '⚠ Video file (warm-up.mp4) not found — please put it next to this page.';
+  });
+
+  /* ================= watch chips ================= */
+  let spotted = 0;
+  WORDS.forEach(w => {
+    const b = document.createElement('button');
+    b.className = 'chip'; b.textContent = w.word;
+    b.addEventListener('click', () => {
+      if (b.classList.contains('heard')) return;
+      b.classList.add('heard');
+      spotted++; $('chipCount').textContent = spotted;
+      speak(w.word);
+    });
+    $('chips').appendChild(b);
+  });
+
+  /* ================= review ================= */
+  WORDS.forEach((w, i) => {
+    const row = document.createElement('div');
+    row.className = 'vrow';
+    row.innerHTML = '<span class="n">' + (i + 1) + '</span>' +
+                    '<span class="w"></span><span class="p"></span><span class="c"></span>';
+    row.children[1].textContent = w.word;
+    row.children[2].textContent = '/' + w.phon + '/';
+    row.children[3].textContent = w.cn;
+    $('vocabGrid').appendChild(row);
+  });
+
+  /* ================= play ================= */
+  function clearEnvelopes() {
+    envelopes.forEach(e => e.el && e.el.remove());
+    envelopes = [];
+  }
+  function stopAll() {
+    clearInterval(timerInterval); timerInterval = null;
+    clearInterval(spawnIntervalId); spawnIntervalId = null;
+    cancelAnimationFrame(animationFrameId); animationFrameId = null;
+  }
+  function updateHUD() {
+    timerDisplay.textContent = timer;
+    scoreDisplay.textContent = score;
+  }
+  function showPrompt() {
+    const it = ITEMS[roundIndex];
+    promptText.innerHTML =
+      '<span class="num">(' + it.n + ')</span>' +
+      it.text.replace('______', '<span class="blank">&nbsp;</span>');
+    missTip.textContent = '';
+  }
+  function spawnWave() {
+    if (!gameActive) return;
+    const it = ITEMS[roundIndex];
+    const others = shuffle(WORDS.filter(w => w.word !== it.word)).slice(0, 3);
+    const options = shuffle([it.word, ...others.map(w => w.word)]);
+
+    const zoneW = fallingZone.clientWidth;
+    const envW = window.innerWidth < 700 ? 108 : 150;
+    const seg = zoneW / 4;
+    const order = shuffle([0, 1, 2, 3]);
+
+    options.forEach((text, idx) => {
+      const el = document.createElement('div');
+      el.className = 'red-envelope' + (text.length > 13 ? ' long' : '');
+      el.textContent = text;
+      let left = order[idx] * seg + (seg - envW) / 2;
+      left = Math.max(4, Math.min(left, zoneW - envW - 4));
+      el.style.left = left + 'px';
+      el.style.top = '-90px';
+
+      const env = { el, isCorrect: text === it.word, top: -90,
+                    speed: FALLING_SPEED_BASE + Math.random() * 0.15, answered: false };
+      el.addEventListener('click', ev => {
+        ev.stopPropagation();
+        if (!gameActive || env.answered) return;
+        env.answered = true;
+        if (env.isCorrect) {
+          el.classList.add('correct');
+          speak(it.word);
+          score++; updateHUD();
+          setTimeout(() => {
+            clearEnvelopes();
+            if (!gameActive) return;
+            roundIndex++;
+            if (roundIndex >= ITEMS.length) return endGame(true);
+            showPrompt(); spawnWave();
+          }, 600);
+        } else {
+          el.classList.add('wrong');
+          missTip.textContent = '❌ Not this one — try again!';
+        }
+      });
+      fallingZone.appendChild(el);
+      envelopes.push(env);
+    });
+  }
+  function animate() {
+    if (gameActive) {
+      const zoneH = fallingZone.clientHeight;
+      const gone = [];
+      envelopes.forEach(env => {
+        if (env.answered && env.isCorrect) return;      // correct: freeze & pop
+        env.top += env.speed;
+        env.el.style.top = env.top + 'px';
+        if (env.top > zoneH) {
+          if (env.isCorrect && !env.answered) {          // missed the right one
+            missTip.textContent = '💨 Missed! Look again…';
+            clearEnvelopes();
+            setTimeout(() => { if (gameActive) spawnWave(); }, 900);
+          }
+          gone.push(env);
+        }
+      });
+      gone.forEach(env => {
+        env.el.remove();
+        const i = envelopes.indexOf(env);
+        if (i > -1) envelopes.splice(i, 1);
+      });
+    }
+    animationFrameId = requestAnimationFrame(animate);
+  }
+  function endGame(win) {
+    gameActive = false;
+    stopAll(); clearEnvelopes();
+    if (speechSynth) speechSynth.cancel();
+    messageTitle.textContent = win ? '🚀 Great!' : "⏰ Time's Up!";
+    messageText.textContent = win
+      ? 'You matched all 10 sentences! Now check the Review tab. 📖'
+      : 'You matched ' + score + ' / 10 sentences. Watch the video again and try once more!';
+    messageOverlay.classList.add('show');
+  }
+  function resetGame() {
+    stopAll(); clearEnvelopes();
+    if (speechSynth) speechSynth.cancel();
+    messageOverlay.classList.remove('show');
+    score = 0; roundIndex = 0; timer = TOTAL_TIME;
+    gameActive = true; updateHUD(); showPrompt();
+    fallingZone.innerHTML = '';
+    clearInterval(timerInterval);
+    timerInterval = setInterval(() => {
+      timer--; updateHUD();
+      if (timer <= 0) { timer = 0; updateHUD(); endGame(false); }
+    }, 1000);
+    setTimeout(spawnWave, 150);
+    if (!animationFrameId) animate();
+  }
+
+  $('restartButton').addEventListener('click', resetGame);
+  $('restartFromOverlay').addEventListener('click', resetGame);
+  speakerBtn.addEventListener('click', () => {
+    if (gameActive && ITEMS[roundIndex]) speak(ITEMS[roundIndex].word);
+  });
+
+  /* fix envelopes if the zone is resized */
+  window.addEventListener('resize', () => {
+    envelopes.forEach(env => { env.el.remove(); });
+    envelopes = [];
+    if (gameActive) setTimeout(spawnWave, 200);
+  });
+})();
+</script>
+</body>
+</html>
